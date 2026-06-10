@@ -22,34 +22,19 @@ jobs:
 
     - name: Install apktool
       run: |
-        # 下载apktool
-        wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O /usr/local/bin/apktool.jar
-        # 创建apktool脚本
-        cat > /usr/local/bin/apktool << 'EOF'
-#!/bin/bash
-java -jar /usr/local/bin/apktool.jar "$@"
-EOF
+        wget -q https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O /usr/local/bin/apktool.jar
+        echo '#!/bin/bash' > /usr/local/bin/apktool
+        echo 'java -jar /usr/local/bin/apktool.jar "$@"' >> /usr/local/bin/apktool
         chmod +x /usr/local/bin/apktool
-        # 验证安装
         apktool --version
 
     - name: Build APK
-      run: |
-        apktool b decompiled -o app-release-unsigned.apk
+      run: apktool b decompiled -o app-release-unsigned.apk
 
     - name: Generate debug keystore and sign APK
       run: |
-        # 生成调试签名密钥
         keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-        
-        # 签名APK
-        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-          -keystore debug.keystore \
-          -storepass android \
-          -keypass android \
-          app-release-unsigned.apk androiddebugkey
-        
-        # 对齐APK
+        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore debug.keystore -storepass android -keypass android app-release-unsigned.apk androiddebugkey
         zipalign -v 4 app-release-unsigned.apk MyDY-release.apk
 
     - name: Upload APK artifact
