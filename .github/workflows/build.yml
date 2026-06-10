@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,14 +25,14 @@ jobs:
 
     - name: Install apktool
       run: |
-        wget -q https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O /usr/local/bin/apktool.jar
-        echo '#!/bin/bash' > /usr/local/bin/apktool
-        echo 'java -jar /usr/local/bin/apktool.jar "$@"' >> /usr/local/bin/apktool
-        chmod +x /usr/local/bin/apktool
-        apktool --version
+        wget -q https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O /home/runner/apktool.jar
+        echo '#!/bin/bash' > /home/runner/apktool
+        echo 'java -jar /home/runner/apktool.jar "$@"' >> /home/runner/apktool
+        chmod +x /home/runner/apktool
+        ls -la /home/runner/apktool*
 
     - name: Build APK
-      run: apktool b decompiled -o app-release-unsigned.apk
+      run: /home/runner/apktool b decompiled -o app-release-unsigned.apk
 
     - name: Generate debug keystore and sign APK
       run: |
