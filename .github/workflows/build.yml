@@ -35,7 +35,10 @@ jobs:
       run: |
         wget -q https://dl.google.com/android/repository/build-tools_r33-linux.zip -O /tmp/build-tools.zip
         unzip -q /tmp/build-tools.zip -d /tmp/build-tools-extracted
-        cp /tmp/build-tools-extracted/33.0.2/zipalign /home/runner/zipalign
+        ls -la /tmp/build-tools-extracted/
+        ZIPALIGN_PATH=$(find /tmp/build-tools-extracted -name "zipalign" -type f)
+        echo "Found zipalign at: $ZIPALIGN_PATH"
+        cp "$ZIPALIGN_PATH" /home/runner/zipalign
         chmod +x /home/runner/zipalign
 
     - name: Build APK
