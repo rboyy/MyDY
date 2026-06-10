@@ -28,7 +28,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get update && sudo apt-get install -y wget unzip
+        sudo apt-get update && sudo apt-get install -y wget unzip libc++1
 
     - name: Install apktool
       run: |
@@ -49,21 +49,13 @@ jobs:
     - name: Sign APK with jarsigner
       run: |
         jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore debug.keystore -storepass android -keypass android app-release-unsigned.apk androiddebugkey
+        jarsigner -verify -verbose app-release-unsigned.apk
 
-    - name: Install zipalign from SDK commandlinetools
+    - name: Install build-tools for zipalign
       run: |
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O /tmp/cmdline-tools.zip
-        unzip -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools
-        ls -la /tmp/cmdline-tools/
-
-    - name: Find and use zipalign
-      run: |
-        ZIPALIGN_PATH=$(find /tmp/cmdline-tools -name "zipalign" -type f 2>/dev/null)
-        if [ -z "$ZIPALIGN_PATH" ]; then
-          wget -q https://dl.google.com/android/repository/build-tools_r30.0.3-linux.zip -O /tmp/build-tools.zip
-          unzip -q /tmp/build-tools.zip -d /tmp/build-tools-extracted
-          ZIPALIGN_PATH=$(find /tmp/build-tools-extracted -name "zipalign" -type f)
-        fi
+        wget -q https://dl.google.com/android/repository/build-tools_r30.0.3-linux.zip -O /tmp/build-tools.zip
+        unzip -q /tmp/build-tools.zip -d /tmp/build-tools-extracted
+        ZIPALIGN_PATH=$(find /tmp/build-tools-extracted -name "zipalign" -type f)
         echo "Found zipalign at: $ZIPALIGN_PATH"
         chmod +x "$ZIPALIGN_PATH"
         "$ZIPALIGN_PATH" -v 4 app-release-unsigned.apk MyDY-release.apk
