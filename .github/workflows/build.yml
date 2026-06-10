@@ -23,19 +23,28 @@ jobs:
         java-version: '17'
         distribution: 'adopt'
 
+    - name: Install Android SDK Build Tools (for zipalign)
+      run: |
+        wget -q https://dl.google.com/android/repository/build-tools_r33-linux.zip -O /tmp/build-tools.zip
+        unzip -q /tmp/build-tools.zip -d /tmp
+        mv /tmp/build-tools /home/runner/build-tools
+        echo "export PATH=/home/runner/build-tools/33.0.2:\$PATH" >> ~/.bashrc
+        source ~/.bashrc
+        zipalign -v
+
     - name: Install apktool
       run: |
         wget -q https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O /home/runner/apktool.jar
         echo '#!/bin/bash' > /home/runner/apktool
         echo 'java -jar /home/runner/apktool.jar "$@"' >> /home/runner/apktool
         chmod +x /home/runner/apktool
-        ls -la /home/runner/apktool*
 
     - name: Build APK
       run: /home/runner/apktool b decompiled -o app-release-unsigned.apk
 
     - name: Generate debug keystore and sign APK
       run: |
+        source ~/.bashrc
         keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
         jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore debug.keystore -storepass android -keypass android app-release-unsigned.apk androiddebugkey
         zipalign -v 4 app-release-unsigned.apk MyDY-release.apk
