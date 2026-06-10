@@ -29,23 +29,23 @@ jobs:
         sudo mv /tmp/apktool /usr/local/bin/apktool
         sudo mv /tmp/apktool.jar /usr/local/bin/apktool.jar
 
-    - name: Create keystore from secrets
-      run: |
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > my-release-key.jks
-
     - name: Build APK
       run: |
         apktool b decompiled -o app-release-unsigned.apk
 
-    - name: Sign APK
+    - name: Generate debug keystore and sign APK
       run: |
-        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
-          -keystore my-release-key.jks \
-          -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
-          -keypass ${{ secrets.KEY_PASSWORD }} \
-          app-release-unsigned.apk ${{ secrets.KEY_ALIAS }}
+        # 生成调试签名密钥（自动生成，不需要手动配置）
+        keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
         
-        # Align APK
+        # 签名APK
+        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+          -keystore debug.keystore \
+          -storepass android \
+          -keypass android \
+          app-release-unsigned.apk androiddebugkey
+        
+        # 对齐APK
         zipalign -v 4 app-release-unsigned.apk MyDY-release.apk
 
     - name: Upload APK artifact
@@ -53,7 +53,3 @@ jobs:
       with:
         name: MyDY-release
         path: MyDY-release.apk
-
-    - name: Cleanup
-      run: |
-        rm -f my-release-key.jks

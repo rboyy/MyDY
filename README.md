@@ -14,26 +14,12 @@ chmod +x build.sh
 
 ### GitHub Actions Auto Build
 
-The project is configured to automatically build on every push to the main branch.
-
-#### Required GitHub Secrets
-
-Add these secrets to your GitHub repository settings (`Settings > Secrets and variables > Actions > New repository secret`):
-
-| Secret Name | Description |
-|-------------|-------------|
-| `KEYSTORE_BASE64` | Base64 encoded keystore file |
-| `KEYSTORE_PASSWORD` | Keystore password |
-| `KEY_PASSWORD` | Key password |
-| `KEY_ALIAS` | Key alias |
-
-#### How to generate Base64 keystore:
-
-```bash
-base64 my-release-key.jks > keystore.base64
-```
-
-Then copy the content of `keystore.base64` to the `KEYSTORE_BASE64` secret.
+**无需配置任何 Secrets！** 每次推送到 `main` 分支时，GitHub Actions 会自动：
+- 检查代码
+- 安装依赖 (apktool)
+- 构建 APK
+- 自动生成调试签名密钥并签名 APK
+- 上传 APK 作为构建产物
 
 ### Project Structure
 
@@ -41,7 +27,7 @@ Then copy the content of `keystore.base64` to the `KEYSTORE_BASE64` secret.
 .
 ├── .github/
 │   └── workflows/
-│       └── build.yml        # GitHub Actions workflow
+│       └── build.yml        # GitHub Actions workflow (自动编译)
 ├── decompiled/              # Decompiled application code
 │   ├── smali/               # Smali source files
 │   ├── assets/              # Assets
@@ -53,7 +39,7 @@ Then copy the content of `keystore.base64` to the `KEYSTORE_BASE64` secret.
 ### Build Output
 
 After successful build, the APK will be available as:
-- `MyDY-release.apk` (signed and aligned)
+- `MyDY-release.apk` (signed with debug key)
 
 ### Requirements
 
