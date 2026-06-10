@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,21 +37,28 @@ jobs:
     - name: Install uber-apk-signer
       run: |
         wget -q https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar -O /home/runner/uber-apk-signer.jar
+        ls -la /home/runner/
 
     - name: Build APK
-      run: /home/runner/apktool b decompiled -o app-release-unsigned.apk
+      run: |
+        /home/runner/apktool b decompiled -o app-release-unsigned.apk
+        ls -la app-release-unsigned.apk
 
     - name: Generate debug keystore
       run: |
         keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+        ls -la debug.keystore
 
     - name: Sign and align APK with uber-apk-signer
       run: |
         java -jar /home/runner/uber-apk-signer.jar --apks app-release-unsigned.apk --ks debug.keystore --ksKeyPass android --ksPass android --alias androiddebugkey --out .
+        ls -la
 
     - name: Rename output APK
       run: |
+        ls -la *.apk
         mv app-release-unsigned-aligned-debugSigned.apk MyDY-release.apk
+        ls -la MyDY-release.apk
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4.3.4
