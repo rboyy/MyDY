@@ -26,9 +26,9 @@ jobs:
     - name: Install Android SDK Build Tools (for zipalign)
       run: |
         wget -q https://dl.google.com/android/repository/build-tools_r33-linux.zip -O /tmp/build-tools.zip
-        unzip -q /tmp/build-tools.zip -d /tmp
-        mv /tmp/build-tools /home/runner/build-tools
-        echo "export PATH=/home/runner/build-tools/33.0.2:\$PATH" >> ~/.bashrc
+        unzip -q /tmp/build-tools.zip -d /tmp/build-tools-extracted
+        BUILD_TOOLS_DIR=$(find /tmp/build-tools-extracted -name "zipalign" -exec dirname {} \;)
+        echo "export PATH=\$BUILD_TOOLS_DIR:\$PATH" >> ~/.bashrc
         source ~/.bashrc
         zipalign -v
 
