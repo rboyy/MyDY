@@ -41,7 +41,6 @@ jobs:
     - name: Build APK
       run: |
         /home/runner/apktool b decompiled -o app-release-unsigned.apk
-        ls -la app-release-unsigned.apk
 
     - name: Generate debug keystore
       run: |
@@ -50,16 +49,12 @@ jobs:
     - name: Sign and align APK with uber-apk-signer
       run: |
         java -jar /home/runner/uber-apk-signer.jar --apks app-release-unsigned.apk --ks debug.keystore --ksKeyPass android --ksPass android --alias androiddebugkey --out . 2>&1
-        echo "=== Generated files ==="
-        ls -la
 
     - name: Find and rename signed APK
       run: |
         SIGNED_APK=$(find . -name "*signed*.apk" -o -name "*aligned*.apk" | head -1)
         if [ -n "$SIGNED_APK" ]; then
-          echo "Found signed APK: $SIGNED_APK"
           mv "$SIGNED_APK" MyDY-release.apk
-          ls -la MyDY-release.apk
         else
           echo "ERROR: Signed APK not found!"
           exit 1
@@ -70,3 +65,17 @@ jobs:
       with:
         name: MyDY-release
         path: MyDY-release.apk
+
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v2.0.8
+      with:
+        tag_name: v1.2.${{ github.run_number }}
+        name: MyDY v1.2.${{ github.run_number }}
+        body: |
+          Automatic build from GitHub Actions
+          - Build: ${{ github.run_number }}
+          - Commit: ${{ github.sha }}
+        files: MyDY-release.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
