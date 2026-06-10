@@ -51,11 +51,13 @@ jobs:
         jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore debug.keystore -storepass android -keypass android app-release-unsigned.apk androiddebugkey
         jarsigner -verify -verbose app-release-unsigned.apk
 
-    - name: Install zipalign from SDK
+    - name: Install zipalign from Build Tools
       run: |
-        wget -q https://dl.google.com/android/repository/platform-tools-latest-linux.zip -O /tmp/platform-tools.zip
-        unzip -q /tmp/platform-tools.zip -d /tmp
-        cp /tmp/platform-tools/zipalign /home/runner/zipalign
+        wget -q https://dl.google.com/android/repository/build-tools_r30.0.3-linux.zip -O /tmp/build-tools.zip
+        unzip -q /tmp/build-tools.zip -d /tmp/build-tools-extracted
+        ZIPALIGN_PATH=$(find /tmp/build-tools-extracted -name "zipalign" -type f)
+        echo "Found zipalign at: $ZIPALIGN_PATH"
+        cp "$ZIPALIGN_PATH" /home/runner/zipalign
         chmod +x /home/runner/zipalign
 
     - name: Align APK with zipalign
