@@ -1,0 +1,137 @@
+.class public final synthetic Lio/sentry/android/replay/l;
+.super Ljava/lang/Object;
+.source "r8-map-id-b76cb7451051306bdba78d5f2de22e5eb562fd89647bf1e55ac4794e6c605af5"
+
+# interfaces
+.implements Lio/sentry/z3;
+
+
+# instance fields
+.field public final synthetic G:I
+
+.field public final synthetic H:Lip2;
+
+
+# direct methods
+.method public synthetic constructor <init>(Lip2;I)V
+    .locals 0
+
+    .line 1
+    iput p2, p0, Lio/sentry/android/replay/l;->G:I
+
+    .line 2
+    .line 3
+    iput-object p1, p0, Lio/sentry/android/replay/l;->H:Lip2;
+
+    .line 4
+    .line 5
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 6
+    .line 7
+    .line 8
+    return-void
+.end method
+
+
+# virtual methods
+.method public final e(Lio/sentry/a1;)V
+    .locals 1
+
+    .line 1
+    iget v0, p0, Lio/sentry/android/replay/l;->G:I
+
+    .line 2
+    .line 3
+    iget-object p0, p0, Lio/sentry/android/replay/l;->H:Lip2;
+
+    .line 4
+    .line 5
+    packed-switch v0, :pswitch_data_0
+
+    .line 6
+    .line 7
+    .line 8
+    invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+
+    .line 9
+    .line 10
+    .line 11
+    new-instance v0, Ljava/util/ArrayList;
+
+    .line 12
+    .line 13
+    invoke-interface {p1}, Lio/sentry/a1;->r()Ljava/util/Queue;
+
+    .line 14
+    .line 15
+    .line 16
+    move-result-object p1
+
+    .line 17
+    invoke-direct {v0, p1}, Ljava/util/ArrayList;-><init>(Ljava/util/Collection;)V
+
+    .line 18
+    .line 19
+    .line 20
+    iput-object v0, p0, Lip2;->G:Ljava/lang/Object;
+
+    .line 21
+    .line 22
+    return-void
+
+    .line 23
+    :pswitch_0
+    sget v0, Lio/sentry/android/replay/ReplayIntegration;->X:I
+
+    .line 24
+    .line 25
+    invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+
+    .line 26
+    .line 27
+    .line 28
+    invoke-interface {p1}, Lio/sentry/a1;->E()Ljava/lang/String;
+
+    .line 29
+    .line 30
+    .line 31
+    move-result-object p1
+
+    .line 32
+    if-eqz p1, :cond_0
+
+    .line 33
+    .line 34
+    const/16 v0, 0x2e
+
+    .line 35
+    .line 36
+    invoke-static {p1, v0, p1}, Lra3;->G0(Ljava/lang/String;CLjava/lang/String;)Ljava/lang/String;
+
+    .line 37
+    .line 38
+    .line 39
+    move-result-object p1
+
+    .line 40
+    goto :goto_0
+
+    .line 41
+    :cond_0
+    const/4 p1, 0x0
+
+    .line 42
+    :goto_0
+    iput-object p1, p0, Lip2;->G:Ljava/lang/Object;
+
+    .line 43
+    .line 44
+    return-void
+
+    .line 45
+    :pswitch_data_0
+    .packed-switch 0x0
+        :pswitch_0
+    .end packed-switch
+.end method

@@ -1,0 +1,59 @@
+name: Build MyDY APK
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Install apktool
+      run: |
+        wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O /tmp/apktool.jar
+        echo '#!/bin/bash' > /tmp/apktool
+        echo 'java -jar /tmp/apktool.jar "$@"' >> /tmp/apktool
+        chmod +x /tmp/apktool
+        sudo mv /tmp/apktool /usr/local/bin/apktool
+        sudo mv /tmp/apktool.jar /usr/local/bin/apktool.jar
+
+    - name: Create keystore from secrets
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > my-release-key.jks
+
+    - name: Build APK
+      run: |
+        apktool b decompiled -o app-release-unsigned.apk
+
+    - name: Sign APK
+      run: |
+        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+          -keystore my-release-key.jks \
+          -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+          -keypass ${{ secrets.KEY_PASSWORD }} \
+          app-release-unsigned.apk ${{ secrets.KEY_ALIAS }}
+        
+        # Align APK
+        zipalign -v 4 app-release-unsigned.apk MyDY-release.apk
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MyDY-release
+        path: MyDY-release.apk
+
+    - name: Cleanup
+      run: |
+        rm -f my-release-key.jks
