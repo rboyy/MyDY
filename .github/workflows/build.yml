@@ -22,12 +22,16 @@ jobs:
 
     - name: Install apktool
       run: |
-        wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O /tmp/apktool.jar
-        echo '#!/bin/bash' > /tmp/apktool
-        echo 'java -jar /tmp/apktool.jar "$@"' >> /tmp/apktool
-        chmod +x /tmp/apktool
-        sudo mv /tmp/apktool /usr/local/bin/apktool
-        sudo mv /tmp/apktool.jar /usr/local/bin/apktool.jar
+        # 下载apktool
+        wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O /usr/local/bin/apktool.jar
+        # 创建apktool脚本
+        cat > /usr/local/bin/apktool << 'EOF'
+#!/bin/bash
+java -jar /usr/local/bin/apktool.jar "$@"
+EOF
+        chmod +x /usr/local/bin/apktool
+        # 验证安装
+        apktool --version
 
     - name: Build APK
       run: |
@@ -35,7 +39,7 @@ jobs:
 
     - name: Generate debug keystore and sign APK
       run: |
-        # 生成调试签名密钥（自动生成，不需要手动配置）
+        # 生成调试签名密钥
         keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
         
         # 签名APK
